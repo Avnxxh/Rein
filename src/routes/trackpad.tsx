@@ -12,6 +12,7 @@ export const Route = createFileRoute('/trackpad')({
 
 function TrackpadPage() {
     const [scrollMode, setScrollMode] = useState(false);
+    const [keyboardOpen, setKeyboardOpen] = useState(false);
     const hiddenInputRef = useRef<HTMLInputElement>(null);
 
     const { status, send } = useRemoteConnection();
@@ -67,16 +68,17 @@ function TrackpadPage() {
             {/* Controls */}
             <ControlBar
                 scrollMode={scrollMode}
+                keyboardOpen={keyboardOpen}
                 onToggleScroll={() => setScrollMode(!scrollMode)}
                 onLeftClick={() => handleClick('left')}
                 onRightClick={() => handleClick('right')}
                 onKeyboardToggle={focusInput}
             />
 
-            {/* Extra Keys */}
+            {/* Extra Keys: horizontally scrollable when keyboard is open */}
             <ExtraKeys
                 sendKey={(k) => send({ type: 'key', key: k })}
-                onInputFocus={focusInput}
+                keyboardOpen={keyboardOpen}
             />
 
             {/* Hidden Input for Mobile Keyboard */}
@@ -85,13 +87,11 @@ function TrackpadPage() {
                 className="opacity-0 absolute bottom-0 pointer-events-none h-0 w-0"
                 onKeyDown={handleKeyDown}
                 onChange={handleInput}
-                onBlur={() => {
-                    setTimeout(() => hiddenInputRef.current?.focus(), 10);
-                }}
+                onFocus={() => setKeyboardOpen(true)}
+                onBlur={() => setKeyboardOpen(false)}
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="off"
-                autoFocus // Attempt autofocus on mount
             />
         </div>
     )

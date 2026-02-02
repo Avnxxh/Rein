@@ -2,6 +2,7 @@ import React from 'react';
 
 interface ControlBarProps {
     scrollMode: boolean;
+    keyboardOpen: boolean;
     onToggleScroll: () => void;
     onLeftClick: () => void;
     onRightClick: () => void;
@@ -10,6 +11,7 @@ interface ControlBarProps {
 
 export const ControlBar: React.FC<ControlBarProps> = ({
     scrollMode,
+    keyboardOpen,
     onToggleScroll,
     onLeftClick,
     onRightClick,
@@ -31,6 +33,7 @@ export const ControlBar: React.FC<ControlBarProps> = ({
             <button
                 className="btn btn-sm btn-outline"
                 onPointerDown={(e) => handleInteraction(e, onLeftClick)}
+                title="Mouse click at cursor position"
             >
                 L-Click
             </button>
@@ -41,8 +44,9 @@ export const ControlBar: React.FC<ControlBarProps> = ({
                 R-Click
             </button>
             <button
-                className="btn btn-sm btn-secondary"
+                className={`btn btn-sm ${keyboardOpen ? 'btn-secondary' : 'btn-secondary btn-outline'}`}
                 onPointerDown={(e) => handleInteraction(e, onKeyboardToggle)}
+                title={keyboardOpen ? 'Keyboard open (tap to close)' : 'Open keyboard'}
             >
                 Keyboard
             </button>
