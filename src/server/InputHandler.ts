@@ -1,15 +1,16 @@
-import { mouse, Point, Button, keyboard } from '@nut-tree-fork/nut-js';
+import { mouse, Point, Button, keyboard, Key } from '@nut-tree-fork/nut-js';
 import { KEY_MAP } from './KeyMap';
 import { CONFIG } from '../config';
 
 export interface InputMessage {
-    type: 'move' | 'click' | 'scroll' | 'key' | 'text';
+    type: 'move' | 'click' | 'scroll' | 'key' | 'text' | 'zoom';
     dx?: number;
     dy?: number;
     button?: 'left' | 'right' | 'middle';
     press?: boolean;
     key?: string;
     text?: string;
+    delta?: number;
 }
 
 export class InputHandler {
@@ -43,11 +44,19 @@ export class InputHandler {
                 if (msg.dx !== undefined && msg.dx !== 0) await mouse.scrollRight(msg.dx * -1 * invertMultiplier);
                 break;
 
+            case 'zoom':
+                if (msg.delta !== undefined && msg.delta !== 0) {
+                    const amount = msg.delta > 0 ? -1 : 1;
+                    await keyboard.pressKey(Key.LeftControl);
+                    await mouse.scrollDown(amount);
+                    await keyboard.releaseKey(Key.LeftControl);
+                }
+                break;
+
             case 'key':
                 if (msg.key) {
                     console.log(`Processing key: ${msg.key}`);
                     const nutKey = KEY_MAP[msg.key.toLowerCase()];
-
                     if (nutKey !== undefined) {
                         await keyboard.type(nutKey);
                     } else if (msg.key.length === 1) {
