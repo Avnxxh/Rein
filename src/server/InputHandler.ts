@@ -52,9 +52,6 @@ export class InputHandler {
                 if (promises.length) await Promise.all(promises);
                 break;
 
-<<<<<<< feat/improved_scroll_performance
-            case 'key': 
-=======
             case 'zoom':
                 if (msg.delta !== undefined && msg.delta !== 0) {
                     const invertMultiplier = (CONFIG.MOUSE_INVERT ?? false) ? -1 : 1;
@@ -73,7 +70,6 @@ export class InputHandler {
                 break;
 
             case 'key':
->>>>>>> main
                 if (msg.key) {
                     console.log(`Processing key: ${msg.key}`);
                     const nutKey = KEY_MAP[msg.key.toLowerCase()];
