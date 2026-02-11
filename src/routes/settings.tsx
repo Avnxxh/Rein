@@ -14,14 +14,19 @@ function SettingsPage() {
     // Client Side Settings (LocalStorage)
     const [invertScroll, setInvertScroll] = useState(() => {
         if (typeof window === 'undefined') return false;
-        const saved = localStorage.getItem('rein_invert');
-        return saved ? JSON.parse(saved) : false;
+        try {
+            const saved = localStorage.getItem('rein_invert');
+            return saved === 'true';
+        } catch {
+            return false;
+        }
     });
     
     const [sensitivity, setSensitivity] = useState(() => {
         if (typeof window === 'undefined') return 1.0;
         const saved = localStorage.getItem('rein_sensitivity');
-        return saved ? parseFloat(saved) : 1.0;
+        const parsed = saved ? parseFloat(saved) : NaN;
+        return Number.isFinite(parsed) ? parsed : 1.0;
     });
 
     const [qrData, setQrData] = useState('');
@@ -50,7 +55,6 @@ function SettingsPage() {
         localStorage.setItem('rein_ip', ip);
 
         if (typeof window !== 'undefined') {
-            // Point to Frontend
             const appPort = String(CONFIG.FRONTEND_PORT);
             const protocol = window.location.protocol;
             const shareUrl = `${protocol}//${ip}:${appPort}/trackpad`;
@@ -92,9 +96,8 @@ function SettingsPage() {
         return () => {
             if (socket.readyState === WebSocket.OPEN) socket.close();
         }
-    }, []); // Run once
+    }, []);
 
-    // Helper for display URL
     const displayUrl = typeof window !== 'undefined'
         ? `${window.location.protocol}//${ip}:${CONFIG.FRONTEND_PORT}/trackpad`
         : `http://${ip}:${CONFIG.FRONTEND_PORT}/trackpad`;
@@ -120,12 +123,11 @@ function SettingsPage() {
                     </label>
                 </div>
 
-                {/* SENSITIVITY SLIDER SECTION */} 
                 <div className="form-control w-full max-w-2xl mx-auto">
                     <label className="label" htmlFor="sensitivity-slider">
                         <span className="label-text">Mouse Sensitivity</span>
                         <span className="label-text-alt font-mono">
-                        {sensitivity.toFixed(1)}x
+                            {sensitivity.toFixed(1)}x
                         </span>
                     </label>
 
@@ -146,7 +148,6 @@ function SettingsPage() {
                         <span>Fast</span>
                     </div>
                 </div>
-
 
                 <div className="form-control w-full">
                     <label className="label cursor-pointer">
@@ -201,11 +202,9 @@ function SettingsPage() {
                                 type: 'update-config',
                                 config: {
                                     frontendPort: parseInt(frontendPort),
-                                    // Removed mouseInvert/Sensitivity from server config update
                                 }
                             }));
 
-                            // Give server time to write config and restart
                             setTimeout(() => {
                                 socket.close();
                                 const newProtocol = window.location.protocol;
