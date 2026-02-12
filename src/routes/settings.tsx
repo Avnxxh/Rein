@@ -192,6 +192,7 @@ function SettingsPage() {
                         </div>
 
                         <button
+                            type="button"
                             className="btn btn-neutral w-full"
                             onClick={() => {
                                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
